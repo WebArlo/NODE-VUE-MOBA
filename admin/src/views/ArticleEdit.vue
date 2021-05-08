@@ -26,7 +26,6 @@
     components: {
       VueEditor
     },
-
     props: {
       id: {}
     },

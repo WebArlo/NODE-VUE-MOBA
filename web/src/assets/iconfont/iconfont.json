@@ -1,0 +1,44 @@
+{
+  "id": "2526997",
+  "name": "MOBA",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "434644",
+      "name": "news",
+      "font_class": "news",
+      "unicode": "e627",
+      "unicode_decimal": 58919
+    },
+    {
+      "icon_id": "1011603",
+      "name": "menu",
+      "font_class": "menu",
+      "unicode": "e63f",
+      "unicode_decimal": 58943
+    },
+    {
+      "icon_id": "1196941",
+      "name": "menu",
+      "font_class": "menu1",
+      "unicode": "e647",
+      "unicode_decimal": 58951
+    },
+    {
+      "icon_id": "2140700",
+      "name": "back",
+      "font_class": "fenxiang",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "6654507",
+      "name": "card-hero",
+      "font_class": "card-hero",
+      "unicode": "e61f",
+      "unicode_decimal": 58911
+    }
+  ]
+}

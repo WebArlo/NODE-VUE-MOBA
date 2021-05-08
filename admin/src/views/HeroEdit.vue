@@ -2,23 +2,31 @@
   <div class="about">
     <h1>{{ id ? '编辑' : '新建'}}英雄 </h1>
     <el-form label-width='120px' @submit.native.prevent="save">
-      <el-tabs type='border-card' value="skills">
+      <el-tabs type='border-card' value="basic">
         <el-tab-pane label='基础信息' name='basic'>
-          <el-form-item label='名称'>
+          <el-form-item label='名称' name='basic'>
             <el-input v-model='model.name'></el-input>
           </el-form-item>
           <el-form-item label='称号'>
             <el-input v-model='model.title'></el-input>
           </el-form-item>
           <el-form-item label='头像'>
-            <el-upload class="avatar-uploader" :action="$http.defaults.baseURL + '/upload'" :show-file-list="false"
-              :on-success="afterUpload">
+            <el-upload class="avatar-uploader" :action="uploadUrl" :headers='getAuthHeaders()' :show-file-list="false" :on-success="res => $set(model,'avatar',res.url)">
               <img v-if="model.avatar" :src="model.avatar" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
+
+          <el-form-item label='Banner'>
+            <el-upload class="avatar-uploader" :action="uploadUrl" :headers='getAuthHeaders()' :show-file-list="false" :on-success="res => $set(model,'banner',res.url)">
+              <img v-if="model.banner" :src="model.banner" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
+          </el-form-item>
+
+
           <el-form-item label='类型'>
-            <el-select v-model="model.categories" multiple>
+            <el-select  v-model="model.categories" multiple>
               <el-option v-for="item of categories" :key='item._id' :label='item.name' :value='item._id'>
               </el-option>
             </el-select>
@@ -64,26 +72,54 @@
         <el-tab-pane label="技能" name='skills'>
           <el-button size='small' @click='model.skills.push({})'><i class="el-icon-plus"></i>添加技能</el-button>
           <el-row type='flex' style="flex-wrap:wrap">
-            <el-col :md='12' v-for='(item,i) in model.skills' :key='i'>
+            <el-col :md='24' v-for='(item,i) in model.skills' :key='i'>
               <el-form-item label='名称'>
                 <el-input v-model="item.name"></el-input>
               </el-form-item>
               <el-form-item label='图标'>
-                <el-upload class="avatar-uploader" :action="$http.defaults.baseURL + '/upload'" :show-file-list="false"
-                  :on-success="res => $set(item,'icon' , res.url)">
+                <el-upload class="avatar-uploader" :action="uploadUrl" :headers='getAuthHeaders()' :show-file-list="false" :on-success="res => $set(item,'icon' , res.url)">
                   <img v-if="item.icon" :src="item.icon" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
               </el-form-item>
-              <el-form-item label='描述'>
-                <el-input  v-model="item.description" type='textarea'></el-input>
+              <el-form-item label='冷却值'>
+                <el-input v-model="item.delay"></el-input>
               </el-form-item>
-              <el-form-item label='小提示' >
+              <el-form-item label='消耗'>
+                <el-input v-model="item.cost"></el-input>
+              </el-form-item>
+              <el-form-item label='描述'>
+                <el-input v-model="item.description" type='textarea'></el-input>
+              </el-form-item>
+              <el-form-item label='小提示'>
                 <el-input v-model="item.tips" type='textarea'></el-input>
               </el-form-item>
-              <el-form-item label='' >
-                <el-button size='small' type='danger' 
-                @click='model.skills.splice(i,1)'>删除</el-button>
+              <el-form-item label=''>
+                <el-button size='small' type='danger' @click='model.skills.splice(i,1)'>删除</el-button>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-tab-pane>
+
+        <el-tab-pane label="最佳搭档" name='partners'>
+          <el-button size='small' @click='model.partners.push({})'><i class="el-icon-plus"></i>添加技能</el-button>
+          <el-row type='flex' style="flex-wrap:wrap">
+            <el-col :md='24' v-for='(item,i) in model.partners' :key='i'>
+              <el-form-item label='英雄'>
+                <el-select filterable v-model="item.hero">
+                  <el-option 
+                  v-for="hero in heroes" 
+                  :key="hero._id"
+                  :value="hero._id"
+                  :label="hero.name"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label='描述'>
+                <el-input v-model="item.description" type='textarea'></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button size='small' type='danger' @click='model.partners.splice(i,1)'>删除</el-button>
               </el-form-item>
             </el-col>
           </el-row>
@@ -106,6 +142,7 @@
       return {
         categories: [],
         items: [],
+        heroes:[],
         model: {
           name: '',
           avatar: '',
@@ -113,14 +150,11 @@
             difficult: 0
           },
           skills: [],
+          partners: [],
         }
       }
     },
     methods: {
-      afterUpload(res) {
-
-        this.model.avatar = res.url
-      },
       async save() {
 
 
@@ -148,42 +182,18 @@
         const res = await this.$http.get(`rest/items`)
         this.items = res.data;
       },
+      async heroesItems() {
+        const res = await this.$http.get(`rest/heroes`)
+        this.heroes = res.data;
+      },
 
     },
 
     created() {
       this.fetchItems()
+      this.heroesItems()
       this.fetchCategories()
       this.id && this.fetch()
     }
   }
 </script>
-
-<style>
-  .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .avatar-uploader .el-upload:hover {
-    border-color: #409EFF;
-  }
-
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 5rem;
-    height: 5rem;
-    line-height: 5rem;
-    text-align: center;
-  }
-
-  .avatar {
-    width: 5rem;
-    height: 5rem;
-    display: block;
-  }
-</style>

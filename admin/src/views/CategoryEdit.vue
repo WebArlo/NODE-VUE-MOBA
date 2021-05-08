@@ -32,8 +32,6 @@
     },
     methods: {
       async save() {
-
-
         if(this.id){
            await this.$http.put(`rest/categories/${this.id}`, this.model)
         }else{
